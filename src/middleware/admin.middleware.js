@@ -11,6 +11,5 @@ console.log(error.message)
 res.status(400).json({message:"invalid input"})
 
 }
-
-
 }
+export default verifyAdmin
