@@ -8,7 +8,7 @@ const addCart=async(req,res)=>{
          carts = await cart.create({items:[{product:productid,quantity}],user: req.user._id})
         }
         else{
-            const item= carts.items.find(i=> i.product.toString()===productid)
+            const item= carts.items.find(i=> i.product && i.product.toString()===productid)
             if(item){
                 item.quantity+=quantity
             }
@@ -26,7 +26,7 @@ const addCart=async(req,res)=>{
 
 const getUserCart= async(req,res)=>{
     try {
-        const cartss= await cart.findOne({user:req.user._id}).populate("items.products")
+        const cartss= await cart.findOne({user:req.user._id}).populate("items.product")
         res.status(200).json({message:"cart is fetched",cartss})
     } catch (error) {
         console.log(error.message)
@@ -41,7 +41,7 @@ const removeCart=async(req,res)=>{
         if(!carts){
             return res.status(404).json({message:"cart not found"})
         }
-        carts.items=carts.items.filter(i=>i.product.toString()!==productid)
+        carts.items=carts.items.filter(i=>i.product && i.product.toString()!==productid)
         await carts.save()
         res.status(200).json({message:"item is removed successfully"})
     } catch (error) {
