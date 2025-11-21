@@ -15,6 +15,16 @@ category:{
 price:{
     type:Number,
     required:true,
+},
+images:{
+    type:[String],
+    default:[],
+    validate: {
+        validator: function(v) {
+            return v.length <= 5;
+        },
+        message: 'Maximum 5 images allowed'
+    }
 }
 },{timestamps:true})
 

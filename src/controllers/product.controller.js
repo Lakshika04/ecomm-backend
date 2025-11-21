@@ -1,10 +1,24 @@
 import product from "../models/product.js";
+import imagekit from '../config/imagekit.js';
 
 const createProduct= async(req,res)=>{
     try {
         const {title,description,category,price}=req.body;
-        const products= await product.create({title,description,category,price})
-        return res.status(201).json({message:"product is created successfully"})
+        let imageUrls = [];
+        
+        if(req.files && req.files.length > 0) {
+            for(const file of req.files) {
+                const result = await imagekit.upload({
+                    file: file.buffer,
+                    fileName: `${Date.now()}_${file.originalname}`,
+                    folder: '/products'
+                });
+                imageUrls.push(result.url);
+            }
+        }
+        
+        const products= await product.create({title,description,category,price,images:imageUrls})
+        return res.status(201).json({message:"product is created successfully", product: products})
     } catch (error) {
         console.log(error.message)
         res.status(500).json({message:error.message})

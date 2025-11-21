@@ -36,7 +36,7 @@ const getUserCart= async(req,res)=>{
 
 const removeCart=async(req,res)=>{
     try {
-        const {productid}=req.body
+        const {productid}=req.params
         const carts= await cart.findOne({user:req.user._id})
         if(!carts){
             return res.status(404).json({message:"cart not found"})
@@ -50,4 +50,25 @@ const removeCart=async(req,res)=>{
     }
 }
 
-export{removeCart,getUserCart,addCart}
+const updateCartItem=async(req,res)=>{
+    try {
+        const {productid, quantity}=req.body
+        const carts= await cart.findOne({user:req.user._id})
+        if(!carts){
+            return res.status(404).json({message:"cart not found"})
+        }
+        const item= carts.items.find(i=> i.product && i.product.toString()===productid)
+        if(item){
+            item.quantity = quantity
+            await carts.save()
+            res.status(200).json({message:"cart updated successfully"})
+        } else {
+            res.status(404).json({message:"item not found in cart"})
+        }
+    } catch (error) {
+        console.log(error.message)
+        res.status(500).json({message:error.message})
+    }
+}
+
+export{removeCart,getUserCart,addCart,updateCartItem}

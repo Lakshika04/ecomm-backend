@@ -28,12 +28,34 @@ const placeOrder = async(req,res)=>{
 
 const getOrder= async(req,res)=>{
     try {
-        const gettOrder = await order.find({user:req.user._id})
-        res.status(200).json({message:"order data is fetched successfully",gettOrder})
+        const orders = await order.find({user:req.user._id}).populate('items.product')
+        res.status(200).json({message:"order data is fetched successfully",orders})
     } catch (error) {
         console.log(error.message)
         res.status(500).json({message:error.message})
     }
 }
 
-export{placeOrder,getOrder}
+const getAllOrders = async(req, res) => {
+    try {
+        const orders = await order.find().populate('user', 'name email').populate('items.product')
+        res.status(200).json({message: "All orders fetched successfully", orders})
+    } catch (error) {
+        console.log(error.message)
+        res.status(500).json({message: error.message})
+    }
+}
+
+const updateOrderStatus = async(req, res) => {
+    try {
+        const {id} = req.params
+        const {status} = req.body
+        const updatedOrder = await order.findByIdAndUpdate(id, {status}, {new: true})
+        res.status(200).json({message: "Order status updated successfully", order: updatedOrder})
+    } catch (error) {
+        console.log(error.message)
+        res.status(500).json({message: error.message})
+    }
+}
+
+export{placeOrder,getOrder,getAllOrders,updateOrderStatus}
